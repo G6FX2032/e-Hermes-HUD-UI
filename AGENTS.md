@@ -101,3 +101,25 @@ FastAPI Backend (Python)
 **Sudo collector:** `backend/collectors/sudo.py` mines `state.db` tool-output messages via FTS for sudo command executions, parses `config.yaml` for approval/security settings, and tails `logs/gateway.log` for explicitly approved commands. Outcome classification: `exit_code=-1` + "approval" in error = blocked; password error in output = failed; `exit_code=0` = success.
 
 **Shared YAML loader:** `backend/collectors/utils.py` exports `load_yaml(text)` — tries `yaml.safe_load`, falls back to a minimal line parser. Used by `config.py` and `sudo.py`.
+
+## Cursor Cloud specific instructions
+
+This estate is a multi-repo workspace under `/agent/repos/*`. The startup update script refreshes dependencies for the runnable/testable code repos; the notes below are for running and validating them. Standard commands live in each repo's README/AGENTS.md and `package.json`/`pyproject.toml` — this section only records the non-obvious Cloud caveats.
+
+### Python setup uses `uv` (not `python3 -m venv`)
+The base image has no `python3-venv`/`ensurepip`, so `python3 -m venv` fails. Use `uv` (installed by the update script to `~/.local/bin`; add it to `PATH`). Create/refresh a venv with `uv venv <dir> --python 3.12` and install with `uv pip install --python <dir>/bin/python ...`. Re-running `uv venv` on an existing venv is a harmless no-op (prints a `--clear` hint); `uv pip install` then refreshes it.
+
+### e-Hermes-HUD-UI (flagship — this repo, full-stack web app)
+- Run dev: `source venv/bin/activate && hermes-hudui --dev` (backend :3001, auto-reload) and, in `frontend/`, `npm run dev` (Vite :5173, proxies `/api` → :3001). See AGENTS.md "Commands".
+- Vite binds to `localhost`/`::1`, **not** `127.0.0.1` — probe it with `curl http://localhost:5173`, not the dotted IP. `ss`/`netstat` are not installed; use `curl` to check ports.
+- The dashboard reads `~/.hermes/` and is **empty on a fresh VM**. Seed `~/.hermes/config.yaml` and `~/.hermes/memories/{MEMORY.md,USER.md}` (entries `§`-delimited) to get meaningful data. The CHAT tab shells out to a `hermes` CLI that is not present in Cloud, so live chat will error — every other tab works from seeded files.
+- Backend tests: `source venv/bin/activate && python -m pytest` (pytest is added by the update script). Frontend `npm run lint` emits 5 `react-refresh` warnings by design (0 errors).
+
+### Other estate code repos (deps installed by the update script)
+- `org-Context7` (pnpm): `pnpm build`, `pnpm lint:check` pass. `pnpm test` — the `sdk` package's network tests need `CONTEXT7_API_KEY`; unit tests pass without it. The MCP server runs via `node packages/mcp/dist/index.js` and needs outbound network + an API key to be useful.
+- `e-CodeKB-Logic` (pnpm, Node ≥22, pnpm ≥10): `pnpm build`, `pnpm lint`, `pnpm test` all pass; `pnpm dev:dashboard` starts the Vite dashboard.
+- `e-VSP-Protocol` (uv/`.venv`): `.venv/bin/pytest` passes; `vsp` is a CLI (no server). `ruff check .` currently reports pre-existing style findings in repo code.
+- `e-Logis-Dashboard` (uv/`.venv`): needs a `.env` (copy `.env.example`; it is gitignored) before `bash scripts/start.sh` (uvicorn :8787). The UI shell + verify checks (`py_compile`, `node --check static/app.js`, `node tests/kill-voice.test.js`) run in Cloud; full Hermes (:8642) / Kokoro TTS (:8085) integration is laptop-only.
+
+### Content-only repos (no dependency install needed)
+`org-Skills`, `org-Social-Media`, `org-Taste` are agent-skill/prompt content. `org-Marketing`, `org-Superpowers`, `org-UI-UX-Pro-Max`, `Logistemia` are content plus light optional tooling. `e-Kokoro-Voice` (TTS) needs `espeak-ng` + a large Hugging Face model download; `G6Fx-Prime` is an incomplete umbrella skeleton (missing `pyproject.toml`, empty submodules) — neither is wired into the update script.
