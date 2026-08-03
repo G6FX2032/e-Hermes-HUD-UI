@@ -244,9 +244,11 @@ P0 can proceed in the Hermes-only workspace. P1–P6 need `e-LOGIS-Dashboard` mo
 
 ---
 
-## 11. Environment blocker (decision A)
+## 11. Environment blocker (decision A) — resolved
 
 This agent run still cannot resolve `G6FX2032/e-LOGIS-Dashboard` (404) and has **no linked Cursor environment**. Unblock by attaching the multi-repo environment, granting repo read access, or explicitly requesting a draft `trigger-environment-build` once the repo is readable.
+
+**Update (3 August 2026):** `e-Logis-Dashboard` is now mounted in the multi-repo Cloud workspace. **P1** (full JARVIS→LOGIS brand sweep) has landed in that repo — see its `g6fx/logis-brand-sweep-f4d2` branch/PR. P2 onward (shared dial primitive, chronometer, capacity ring, Pomodoro, system radial) can proceed there next.
 
 ---
 
