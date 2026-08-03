@@ -1,8 +1,8 @@
 # LOGIS Brand, Chronometer, Pomodoro & Shell Unification — Design Spec
 
-**Date:** 3 August 2026 (revised same day)  
-**Status:** Awaiting user review before implementation plan  
-**Repos:** `e-LOGIS-Dashboard` (primary UI work) + `e-Hermes-HUD-UI` (theme-first amalgamation)  
+**Date:** 3 August 2026 (revised same day)
+**Status:** Approved for implementation; Hermes P0 complete
+**Repos:** `e-Logis-Dashboard` (primary UI work) + `e-Hermes-HUD-UI` (theme-first amalgamation)
 **IP posture:** Product branding is **LOGIS**. Visual language may be *inspired by* popular HUD motifs; never ship user-facing **JARVIS** labels, theme ids, aria text, docs headings or comments that present JARVIS as the product name.
 
 ---
@@ -68,10 +68,10 @@ Keep MECE surfaces: LOGIS = channel/act; Hermes = monitor/read. Unify chrome and
 
 Inside `.topbar-right`, order left→right:
 
-1. `.chrono` (month dial + time/date readout)  
-2. `.capacity` (power/capacity ring)  
-3. `.leds` (existing status LEDs)  
-4. **System radial trigger** (replaces/absorbs scattered settings/close affordances where sensible)  
+1. `.chrono` (month dial + time/date readout)
+2. `.capacity` (power/capacity ring)
+3. `.leds` (existing status LEDs)
+4. **System radial trigger** (replaces/absorbs scattered settings/close affordances where sensible)
 
 Thin `--line` dividers between meter groups. On `@media (max-width: 1100px)` allow wrap; chrono+capacity stay grouped.
 
@@ -104,9 +104,9 @@ Sibling ring primitive bound to `/api/status` (or LED sources). Colour + text (n
 | **Theme** (optional “etc.”) | Cycle or open theme/scanline controls if present |
 | **Always-on-top** (optional) | Only if the host shell supports it; otherwise omit |
 
-- Interaction: click to open/close; `Escape` / click-outside closes.  
-- A11y: `aria-expanded`, `role="menu"` / `menuitem`, arrow keys, ≥44px targets.  
-- Motion: 150–300ms; instant under `prefers-reduced-motion`.  
+- Interaction: click to open/close; `Escape` / click-outside closes.
+- A11y: `aria-expanded`, `role="menu"` / `menuitem`, arrow keys, ≥44px targets.
+- Motion: 150–300ms; instant under `prefers-reduced-motion`.
 - Do **not** duplicate left-side prefixes (`/agent0`, `/wayfinder`, …).
 
 ---
@@ -117,7 +117,7 @@ Sibling ring primitive bound to `/api/status` (or LED sources). Colour + text (n
 
 - **Top-centre-ish** in the topbar (between brand and `.topbar-right`), as another dial sibling to chrono/capacity.
 - Compact representation: radial remaining-time arc + centre readout (`MM:SS` or `H:MM:SS` for long focuses) + small phase label (`FOCUS` / `BREAK`).
-- **Primary click:** start / pause (or resume).  
+- **Primary click:** start / pause (or resume).
 - **Right-click (context menu):** open **Configure Pomodoro** popup (also reachable via a ⋯ inside the popup for keyboard users: Shift+F10 / menu key when focused).
 
 ### 6.2 Configure Pomodoro popup
@@ -137,10 +137,10 @@ Validation: durations ≥ 1 minute; sensible max (e.g. 240 min) with a soft warn
 
 ### 6.3 Lifecycle
 
-1. Idle → user starts focus.  
-2. Focus counts down; arc = **remaining / total** (remaining-centric is less anxiety-framed than “how expired”).  
-3. At 0: brief completion pulse → if auto-start break → **break** countdown with green stage colours.  
-4. Break at 0 → idle (or auto-start next focus if enabled).  
+1. Idle → user starts focus.
+2. Focus counts down; arc = **remaining / total** (remaining-centric is less anxiety-framed than “how expired”).
+3. At 0: brief completion pulse → if auto-start break → **break** countdown with green stage colours.
+4. Break at 0 → idle (or auto-start next focus if enabled).
 5. Pause freezes remaining; config edits apply to the **next** segment unless user chooses “apply now & reset”.
 
 ### 6.4 Colour stages (research-backed — avoid alarm red)
@@ -171,8 +171,8 @@ Arc interpolates between stage stops (CSS or canvas). Optional gentle brightness
 
 ### 6.5 A11y
 
-- `role="timer"` / accessible name including phase + remaining.  
-- Announce phase changes (focus→break→idle) via polite `aria-live` **once**, not every second.  
+- `role="timer"` / accessible name including phase + remaining.
+- Announce phase changes (focus→break→idle) via polite `aria-live` **once**, not every second.
 - Config popup: labelled fields, Esc closes, focus trap.
 
 ---
@@ -244,28 +244,28 @@ P0 can proceed in the Hermes-only workspace. P1–P6 need `e-LOGIS-Dashboard` mo
 
 ---
 
-## 11. Environment blocker (decision A)
+## 11. Environment (decision A)
 
-This agent run still cannot resolve `G6FX2032/e-LOGIS-Dashboard` (404) and has **no linked Cursor environment**. Unblock by attaching the multi-repo environment, granting repo read access, or explicitly requesting a draft `trigger-environment-build` once the repo is readable.
+The multi-repository environment is active. LOGIS is mounted at `/agent/repos/e-Logis-Dashboard`; continue P1–P6 there from its `master` branch.
 
 ---
 
 ## 12. Testing / acceptance
 
-- Chronometer: August ~8/12 arc; 12/24 + local/UTC persist; no SR spam.  
-- Capacity: matches LED/status semantics.  
-- Pomodoro: custom durations (incl. 120); break auto-starts; colours follow calm→amber→soft rose→green; right-click opens configure; pause works.  
-- System radial: top-right; settings / HUD placeholder / close; **no** command prefixes; HUD control is non-navigating until amalgamation.  
-- Brand: no product-facing `jarvis`/`JARVIS` left in LOGIS tree (except intentional history).  
-- Hermes: `data-theme="logis"`; lint/build clean.  
+- Chronometer: August ~8/12 arc; 12/24 + local/UTC persist; no SR spam.
+- Capacity: matches LED/status semantics.
+- Pomodoro: custom durations (incl. 120); break auto-starts; colours follow calm→amber→soft rose→green; right-click opens configure; pause works.
+- System radial: top-right; settings / HUD placeholder / close; **no** command prefixes; HUD control is non-navigating until amalgamation.
+- Brand: no product-facing `jarvis`/`JARVIS` left in LOGIS tree (except intentional history).
+- Hermes: `data-theme="logis"`; lint/build clean.
 - Motion and ~1100px widths checked.
 
 ---
 
 ## 13. Spec self-review
 
-- Radial relocated top-right; command coupling removed.  
-- Pomodoro + research-backed palette documented with citations (summary).  
-- Plasma path scoped as phased widget containments — not a native plasmashell port.  
-- Double-click UTC interpretation retained unless you prefer a four-mode click cycle.  
+- Radial relocated top-right; command coupling removed.
+- Pomodoro + research-backed palette documented with citations (summary).
+- Plasma path scoped as phased widget containments — not a native plasmashell port.
+- Double-click UTC interpretation retained unless you prefer a four-mode click cycle.
 - **HUD switch** locked as **C** (placeholder until Monitor↔Channel amalgamation).

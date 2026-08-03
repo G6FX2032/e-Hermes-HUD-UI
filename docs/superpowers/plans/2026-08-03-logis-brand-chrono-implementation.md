@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship Hermes HUD `logis` theme first, then (when `e-LOGIS-Dashboard` is available) brand-sweep LOGIS and add chronometer, capacity ring, Pomodoro, top-right system radial, and a minimal widget registry.
+**Goal:** Ship Hermes HUD `logis` theme first, then brand-sweep LOGIS and add chronometer, capacity ring, Pomodoro, top-right system radial, and a minimal widget registry.
 
 **Architecture:** Keep Monitor (Hermes) and Channel (LOGIS) as separate apps. Unify design DNA via a shared cyan OLED `logis` theme on Hermes. On LOGIS, introduce a shared dial primitive and treat topbar meters as widgets with `localStorage` config. System radial is shell chrome only (no Command Matrix).
 
@@ -29,7 +29,12 @@
 - `tests/test_frontend_themes.py` — static registration tests
 - `CHANGELOG.md` — Unreleased note
 
-**File map (LOGIS — confirm after clone):** inventory in Task 2; expect topbar/brand/LED markup under static or root HTML/CSS/JS plus FastAPI status endpoint.
+**File map (LOGIS — mounted at `/agent/repos/e-Logis-Dashboard`):**
+- `static/index.html` — shell, topbar and modal markup
+- `static/styles.css` — HUD tokens and component styling
+- `static/app.js` — channel, explorer and voice behaviour
+- `server.py` — FastAPI proxy and read-only data endpoints
+- `tests/` — regression checks
 
 ---
 
@@ -91,7 +96,7 @@ def test_logis_theme_is_registered_and_styled() -> None:
 
 - [x] **Step 2: Run test to verify it fails**
 
-Run: `cd /workspace && python -m pytest tests/test_frontend_themes.py::test_logis_theme_is_registered_and_styled -v`  
+Run: `cd /agent/repos/e-Hermes-HUD-UI && uv run --with pytest --no-project python -m pytest tests/test_frontend_themes.py::test_logis_theme_is_registered_and_styled -v`
 Expected: FAIL (theme not registered)
 
 - [x] **Step 3: Implement theme registration + CSS + i18n**
@@ -110,7 +115,7 @@ Add THEMES entry after `hermes-official` (or at end):
 
 In `index.css`, after the anime block, add `[data-theme="logis"] { … }` with the token values above. Update the file header comment from “5 themes” to “6 themes”.
 
-In `translations.ts` en: `'theme.logis': 'LOGIS',`  
+In `translations.ts` en: `'theme.logis': 'LOGIS',`
 zh: `'theme.logis': 'LOGIS',` (brand untranslated)
 
 In `CHANGELOG.md` under Unreleased → Added: LOGIS theme (cyan OLED palette aligned with the Channel dashboard).
@@ -120,8 +125,9 @@ In `CHANGELOG.md` under Unreleased → Added: LOGIS theme (cyan OLED palette ali
 Run:
 
 ```bash
-cd /workspace && python -m pytest tests/test_frontend_themes.py -v
-cd /workspace/frontend && npm run lint
+cd /agent/repos/e-Hermes-HUD-UI
+uv run --with pytest --no-project python -m pytest tests/test_frontend_themes.py -v
+cd frontend && npm run lint
 ```
 
 Expected: pytest PASS; lint 0 errors
@@ -135,10 +141,10 @@ git commit -m "feat(theme): add LOGIS cyan OLED theme to Hermes HUD"
 
 ---
 
-### Task 2: Obtain LOGIS tree + brand inventory (blocker gate)
+### Task 2: Confirm LOGIS tree + brand inventory
 
 **Files:**
-- Create: working copy of `e-LOGIS-Dashboard` (path TBD by environment; prefer `/home/ubuntu/repos/e-LOGIS-Dashboard` or multi-repo workspace root)
+- Use: `/agent/repos/e-Logis-Dashboard`
 - Create: `/tmp/logis-jarvis-inventory.txt` (scratch; do not commit)
 
 **Interfaces:**
@@ -148,16 +154,15 @@ git commit -m "feat(theme): add LOGIS cyan OLED theme to Hermes HUD"
 - [ ] **Step 1: Verify repo access**
 
 ```bash
-gh repo view G6FX2032/e-LOGIS-Dashboard
-# or clone the canonical URL once access exists
+git -C /agent/repos/e-Logis-Dashboard status --short --branch
 ```
 
-Expected: repo resolves. If 404, stop and report blocker (Tasks 3–8 cannot proceed).
+Expected: clean `master` checkout tracking `origin/master`.
 
 - [ ] **Step 2: Inventory JARVIS strings**
 
 ```bash
-rg -n -i 'jarvis' --glob '!**/node_modules/**' --glob '!**/.git/**' /path/to/e-LOGIS-Dashboard | tee /tmp/logis-jarvis-inventory.txt
+rg -n -i 'jarvis' --glob '!**/node_modules/**' --glob '!**/.git/**' /agent/repos/e-Logis-Dashboard | tee /tmp/logis-jarvis-inventory.txt
 ```
 
 - [ ] **Step 3: Record structural paths**
@@ -180,7 +185,7 @@ Locate and note absolute paths for: main HTML shell, CSS tokens (`:root` / `--cy
 - [ ] **Step 1: Failing check**
 
 ```bash
-rg -i 'jarvis' /path/to/e-LOGIS-Dashboard --glob '!**/.git/**' | rg -v 'CHANGELOG' ; echo exit:$?
+rg -i 'jarvis' /agent/repos/e-Logis-Dashboard --glob '!**/.git/**' | rg -v 'CHANGELOG' ; echo exit:$?
 ```
 
 Expected: matches exist (non-empty) before sweep.
@@ -192,7 +197,7 @@ Replace user-facing and identifier uses with LOGIS/logis per spec §7. Theme/cla
 - [ ] **Step 3: Verify**
 
 ```bash
-rg -i 'jarvis' /path/to/e-LOGIS-Dashboard --glob '!**/.git/**' --glob '!**/CHANGELOG*'
+rg -i 'jarvis' /agent/repos/e-Logis-Dashboard --glob '!**/.git/**' --glob '!**/CHANGELOG*'
 ```
 
 Expected: no matches.
@@ -353,6 +358,6 @@ git commit -m "feat(widgets): allow show/hide for topbar meter widgets"
 
 ## Plan self-review
 
-1. **Spec coverage:** P0 theme ✓; brand sweep ✓; chrono ✓; capacity ✓; Pomodoro + colours ✓; system radial + HUD C ✓; Plasma W1 ✓; full Plasma W2/W3 deferred (spec allows).  
-2. **Placeholders:** LOGIS absolute paths deferred to Task 2 inventory by necessity (repo not mounted).  
+1. **Spec coverage:** P0 theme ✓; brand sweep ✓; chrono ✓; capacity ✓; Pomodoro + colours ✓; system radial + HUD C ✓; Plasma W1 ✓; full Plasma W2/W3 deferred (spec allows).
+2. **Paths:** Hermes and LOGIS commands use the mounted `/agent/repos/` workspaces.
 3. **Naming:** `logis` theme id, `logis.*` localStorage prefix, no `jarvis`.
